@@ -10,19 +10,95 @@ type Person = {
 
 // console.log("Type Person creato!");
 
-async function fetchActors(): Promise<Person[]> {
+
+
+// async function fetchActors(): Promise<Person[]> {
+//   try {
+//     const response = await fetch('http://localhost:3333/actors');
+//     const data: Person[] = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error('Errore nel fetch:', error);
+//     return [];
+//   }
+// }
+// // Funzione principale
+// async function main(): Promise<void> {
+//   const actors = await fetchActors();
+//   console.log('Attori ricevuti:', actors);
+// }
+// main();
+
+// Milestone 2: Type alias Actress che estende Person
+type Actress = Person & {
+  most_famous_movies: [string, string, string];
+  awards: string;
+  nationality: "American" | "British" | "Australian" | "Israeli-American" |
+  "South African" | "French" | "Indian" | "Israeli" |
+  "Spanish" | "South Korean" | "Chinese";
+};
+
+// Funzione per fetchare attrici dal server API
+// async function fetchActresses(): Promise<Actress[]> {
+//   try {
+//     const response = await fetch('http://localhost:3333/actresses');
+//     const data: Actress[] = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error('Errore nel fetch delle attrici:', error);
+//     return [];
+//   }
+// }
+
+// // Funzione principale
+// async function main(): Promise<void> {
+//   const actresses = await fetchActresses();
+//   console.log('Attrici ricevute:', actresses);
+// }
+
+// main();
+
+
+
+// Type guard per verificare se un oggetto è una Actress
+function isActress(obj: unknown): obj is Actress {
+  if (!obj || typeof obj !== 'object') return false;
+
+  const candidate = obj as Record<string, unknown>;
+
+  return typeof candidate.id === 'number' &&
+    typeof candidate.name === 'string' &&
+    typeof candidate.birth_year === 'number' &&
+    (candidate.death_year === undefined || typeof candidate.death_year === 'number') &&
+    Array.isArray(candidate.most_famous_movies) &&
+    candidate.most_famous_movies.length === 3 &&
+    typeof candidate.nationality === 'string';
+}
+
+// Funzione per ottenere una singola attrice per ID
+async function getActress(id: number): Promise<Actress | null> {
   try {
-    const response = await fetch('http://localhost:3333/actors');
-    const data: Person[] = await response.json();
-    return data;
+    const response = await fetch(`http://localhost:3333/actresses/${id}`);
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+
+    if (isActress(data)) {
+      return data;
+    } else {
+      console.error('Dati ricevuti non sono una Actress valida:', data);
+      return null;
+    }
   } catch (error) {
-    console.error('Errore nel fetch:', error);
-    return [];
+    console.error('Errore nel fetch dell\'attrice:', error);
+    return null;
   }
 }
 // Funzione principale
 async function main(): Promise<void> {
-  const actors = await fetchActors();
-  console.log('Attori ricevuti:', actors);
+  const actress = await getActress(23);
+  console.log('Attrice con ID 23:', actress);
 }
-main();
+
+main()
