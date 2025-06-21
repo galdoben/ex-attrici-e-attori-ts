@@ -76,29 +76,57 @@ function isActress(obj: unknown): obj is Actress {
 }
 
 // Funzione per ottenere una singola attrice per ID
-async function getActress(id: number): Promise<Actress | null> {
+// async function getActress(id: number): Promise<Actress | null> {
+//   try {
+//     const response = await fetch(`http://localhost:3333/actresses/${id}`);
+//     if (!response.ok) {
+//       return null;
+//     }
+//     const data = await response.json();
+
+//     if (isActress(data)) {
+//       return data;
+//     } else {
+//       console.error('Dati ricevuti non sono una Actress valida:', data);
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Errore nel fetch dell\'attrice:', error);
+//     return null;
+//   }
+// }
+// Funzione principale
+// async function main(): Promise<void> {
+//   const actress = await getActress(23);
+//   console.log('Attrice con ID 23:', actress);
+// }
+
+// main()
+
+// Funzione per ottenere tutte le attrici
+async function getAllActresses(): Promise<Actress[]> {
   try {
-    const response = await fetch(`http://localhost:3333/actresses/${id}`);
+    const response = await fetch('http://localhost:3333/actresses');
     if (!response.ok) {
-      return null;
+      return [];
     }
     const data = await response.json();
 
-    if (isActress(data)) {
-      return data;
+    if (Array.isArray(data)) {
+      return data.filter(isActress);
     } else {
-      console.error('Dati ricevuti non sono una Actress valida:', data);
-      return null;
+      console.error('Risposta non è un array:', data);
+      return [];
     }
   } catch (error) {
-    console.error('Errore nel fetch dell\'attrice:', error);
-    return null;
+    console.error('Errore nel fetch di tutte le attrici:', error);
+    return [];
   }
 }
 // Funzione principale
 async function main(): Promise<void> {
-  const actress = await getActress(23);
-  console.log('Attrice con ID 23:', actress);
+  const actresses = await getAllActresses();
+  console.log('Tutte le attrici:', actresses);
 }
 
-main()
+main();
